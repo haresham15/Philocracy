@@ -1,0 +1,179 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useCartStore } from "@/store/cart-store";
+import { useState, useEffect } from "react";
+
+export function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const totalItems = useCartStore((s) => s.totalItems());
+  const openCart = useCartStore((s) => s.openCart);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const showSolid = scrolled || !isHome;
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        showSolid ? "nav-glass shadow-md" : "bg-transparent"
+      }`}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between sm:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full transition-transform duration-300 group-hover:scale-110">
+              <Image
+                src="/circleLogo.jpeg"
+                alt="Philocracy"
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            </div>
+            <span
+              className={`font-heading text-xl font-bold tracking-tight sm:text-2xl transition-colors duration-300 ${
+                showSolid ? "text-charcoal" : "text-white"
+              }`}
+            >
+              philocracy
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-8 md:flex">
+            {[
+              { label: "Home", href: "/" },
+              { label: "Shop", href: "/shop" },
+              { label: "Mission", href: "/#mission" },
+              { label: "Board", href: "/board" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className={`relative text-sm font-medium tracking-wide uppercase transition-colors duration-300 hover:text-amber ${
+                  showSolid ? "text-charcoal" : "text-white/90"
+                } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blush-pink after:transition-all after:duration-300 hover:after:w-full`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Cart + Mobile toggle */}
+          <div className="flex items-center gap-4">
+            {/* Cart button */}
+            <button
+              onClick={openCart}
+              className={`relative p-2 transition-colors duration-300 hover:text-amber ${
+                showSolid ? "text-charcoal" : "text-white"
+              }`}
+              aria-label="Open cart"
+              id="cart-button"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              {mounted && totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-blush-pink text-[10px] font-bold text-white shadow-sm">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
+            {/* Mobile hamburger */}
+            <button
+              className={`p-2 md:hidden transition-colors duration-300 ${
+                showSolid ? "text-charcoal" : "text-white"
+              }`}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+              id="mobile-menu-toggle"
+            >
+              {mobileOpen ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="nav-glass border-t border-warm-tan-light md:hidden">
+          <nav className="flex flex-col gap-1 px-4 py-4">
+            {[
+              { label: "Home", href: "/" },
+              { label: "Shop", href: "/shop" },
+              { label: "Mission", href: "/#mission" },
+              { label: "Board", href: "/board" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-4 py-3 text-sm font-medium tracking-wide uppercase text-charcoal transition-colors hover:bg-blush-pink-light hover:text-charcoal"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}

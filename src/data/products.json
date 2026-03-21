@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Sam's Fans Drop",
+    "price": 6500,
+    "description": "An exclusive piece dropping in collaboration with Sam's Fans. 100% of profits support music and art therapy for seriously ill children and their families.",
+    "charity_partner": "Sam's Fans",
+    "charity_description": "Sam's Fans is an Ohio-based non-profit organization that supports and enhances music and art therapy programs for seriously ill children and their families.",
+    "images": ["/products/empathy-hoodie.jpg"],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "category": "current",
+    "featured": true
+  },
+  {
+    "id": "2",
+    "name": "LSS Choices Drop",
+    "price": 6500,
+    "description": "An exclusive piece from our collaboration with LSS Choices. 100% of profits help provide safe haven and crisis support for victims of domestic violence.",
+    "charity_partner": "LSS Choices",
+    "charity_description": "LSS Choices for Victims of Domestic Violence provides a 24-hour crisis line, emergency shelter, and counseling to interrupt the cycle of domestic violence in central Ohio.",
+    "images": ["/products/unity-tee.jpg"],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "category": "past",
+    "featured": true
+  }
+]

@@ -9,7 +9,8 @@
     "images": ["/products/empathy-hoodie.jpg"],
     "sizes": ["S", "M", "L", "XL", "XXL"],
     "category": "current",
-    "featured": true
+    "featured": true,
+    "weight_oz": 24
   },
   {
     "id": "2",
@@ -21,6 +22,7 @@
     "images": ["/products/unity-tee.jpg"],
     "sizes": ["S", "M", "L", "XL", "XXL"],
     "category": "past",
-    "featured": true
+    "featured": true,
+    "weight_oz": 8
   }
 ]

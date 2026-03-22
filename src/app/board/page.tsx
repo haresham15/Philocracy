@@ -5,31 +5,31 @@ export default function BoardPage() {
   const members = [
     {
       id: 1,
-      name: "[Member 1 Name]",
-      role: "[Member 1 Role / Title]",
+      name: "Lasya Kopuri",
+      role: "President",
       description:
-        "[Placeholder description for Member 1. Write about their background, what they bring to Philocracy, and their passion for the mission.]",
+        "Lasya is a third-year undergraduate student at The Ohio State University",
     },
     {
       id: 2,
-      name: "[Member 2 Name]",
-      role: "[Member 2 Role / Title]",
+      name: "Haresh Murugesan",
+      role: "Director of Finances",
       description:
-        "[Placeholder description for Member 2. Write about their background, what they bring to Philocracy, and their passion for the mission.]",
+        "Haresh is a Second-year undergraduate student at The Ohio State University",
     },
     {
       id: 3,
-      name: "[Member 3 Name]",
-      role: "[Member 3 Role / Title]",
+      name: "Abhay Athereya",
+      role: "Director of Operations",
       description:
-        "[Placeholder description for Member 3. Write about their background, what they bring to Philocracy, and their passion for the mission.]",
+        "Abhay is a First-year undergraduate student at The Ohio State University",
     },
   ];
 
   return (
     <div className="min-h-screen bg-soft-cream pt-24 pb-20 sm:pt-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="mb-16 max-w-2xl text-center md:mx-auto md:mb-24">
           <p className="text-sm font-medium uppercase tracking-[0.3em] text-blush-pink">
@@ -46,15 +46,15 @@ export default function BoardPage() {
         {/* Board Members Grid */}
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           {members.map((member) => (
-            <div 
-              key={member.id} 
+            <div
+              key={member.id}
               className="flex flex-col items-center rounded-3xl bg-white p-8 text-center shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
             >
               {/* Icon Section */}
               <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-blush-pink-light shadow-inner">
                 <User className="h-10 w-10 text-blush-pink-deep" strokeWidth={1.5} />
               </div>
-              
+
               {/* Info Section */}
               <h2 className="font-heading text-2xl font-bold text-charcoal">
                 {member.name}
@@ -62,7 +62,7 @@ export default function BoardPage() {
               <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-blush-pink">
                 {member.role}
               </p>
-              
+
               {/* Description Section */}
               <div className="mt-6 flex-1 rounded-2xl bg-warm-cream/50 p-6 text-sm leading-relaxed text-muted-foreground">
                 <p>{member.description}</p>
@@ -80,7 +80,7 @@ export default function BoardPage() {
             Learn More About Our Mission
           </Link>
         </div>
-        
+
       </div>
     </div>
   );

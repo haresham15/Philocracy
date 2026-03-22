@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/store/cart-store";
 import Image from "next/image";
 import { checkout } from "@/app/actions/checkout";
+import { useState } from "react";
+import { getShippingRates, type ShippingRate } from "@/app/actions/shipping";
 
 export function CartSidebar() {
   const { items, isOpen, closeCart, removeItem, updateQuantity } =
@@ -19,9 +21,23 @@ export function CartSidebar() {
   const totalPrice = useCartStore((s) => s.totalPrice());
   const totalItems = useCartStore((s) => s.totalItems());
 
+  const [zipCode, setZipCode] = useState("");
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
+
   const handleCheckout = async () => {
     try {
-      const result = await checkout(items);
+      let finalRates = shippingRates;
+      
+      // Attempt to calculate rates immediately if they haven't but provided a zip
+      if (!finalRates.length) {
+        setIsCalculating(true);
+        finalRates = await getShippingRates(zipCode, items);
+        setShippingRates(finalRates);
+        setIsCalculating(false);
+      }
+
+      const result = await checkout(items, finalRates);
       if (result?.url) {
         window.location.href = result.url;
       }
@@ -179,6 +195,44 @@ export function CartSidebar() {
               <p className="text-xs text-muted-foreground">
                 Shipping and taxes calculated at checkout
               </p>
+
+              {/* Zip Code for Shipping */}
+              <div className="flex flex-col gap-2 w-full pt-2 pb-2">
+                <label htmlFor="zipCode" className="text-xs font-semibold text-charcoal">
+                  Calculate Shipping
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="zipCode"
+                    value={zipCode}
+                    onChange={(e) => setZipCode(e.target.value)}
+                    placeholder="Destination Zip Code"
+                    className="flex h-10 w-full rounded-xl border border-input/50 bg-white/50 px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    maxLength={10}
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="whitespace-nowrap rounded-xl border-input/50"
+                    onClick={async () => {
+                      if (zipCode.length < 5) return;
+                      setIsCalculating(true);
+                      const rates = await getShippingRates(zipCode, items);
+                      setShippingRates(rates);
+                      setIsCalculating(false);
+                    }}
+                    disabled={isCalculating || zipCode.length < 5}
+                  >
+                    {isCalculating ? "Calculating..." : "Get Rates"}
+                  </Button>
+                </div>
+                {shippingRates.length > 0 && (
+                  <div className="rounded-lg bg-green-50 p-2 mt-1">
+                    <p className="text-xs text-green-700 font-medium">
+                      ✓ Shipping rates calculated and ready for checkout.
+                    </p>
+                  </div>
+                )}
+              </div>
               <Button
                 onClick={handleCheckout}
                 size="lg"

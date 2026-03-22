@@ -41,21 +41,26 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex h-screen flex-col items-center justify-center px-4 text-center">
+      <div className="relative flex h-screen flex-col items-center justify-center px-4 text-center">
         <p className="animate-fade-in-up mb-6 text-sm font-medium uppercase tracking-[0.3em] text-white/80 sm:text-base">
           Governance by love
         </p>
 
         {/* Brand Wordmark */}
-        <div className="animate-fade-in-up delay-100 relative w-[280px] sm:w-[400px] md:w-[500px] lg:w-[600px] mb-6">
-          <Image
-            src="/mainTextTitle.jpg"
-            alt="philocracy"
-            width={1200}
-            height={200}
-            className="w-full h-auto brightness-0 invert"
-            priority
-          />
+        <div className="relative mb-6 flex w-[280px] sm:w-[400px] md:w-[500px] lg:w-[600px] items-center justify-center">
+          {/* Enhanced underglow to make the original text perfectly visible on dark backdrops */}
+          <div className="absolute inset-0 bg-soft-cream/60 blur-[50px] scale-150 rounded-[100%] pointer-events-none" />
+          
+          <div className="animate-fade-in-up delay-100 relative w-full mix-blend-multiply opacity-90">
+            <Image
+              src="/mainTextTitle.jpg"
+              alt="philocracy"
+              width={1200}
+              height={200}
+              className="w-full h-auto"
+              priority
+            />
+          </div>
         </div>
 
         <p className="animate-fade-in-up delay-200 mt-4 max-w-lg text-base leading-relaxed text-white/70 sm:text-lg">

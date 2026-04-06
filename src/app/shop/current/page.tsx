@@ -1,6 +1,12 @@
-"use client";
-
+import { Metadata } from "next";
 import { ProductCard } from "@/components/ProductCard";
+
+export const metadata: Metadata = {
+  title: "Current Drop",
+  description:
+    "Shop the active Philocracy drop. Exclusively available for a limited time to support our chosen non-profit partner.",
+};
+
 import products from "@/data/products.json";
 
 export default function CurrentShopPage() {

@@ -1,6 +1,12 @@
-"use client";
-
+import { Metadata } from "next";
 import { ProductCard } from "@/components/ProductCard";
+
+export const metadata: Metadata = {
+  title: "All Drops & Collaborations",
+  description:
+    "Shop all exclusive Philocracy clothing drops and collaborations. Every purchase supports a vetted non-profit organization.",
+};
+
 import products from "@/data/products.json";
 
 export default function ShopPage() {

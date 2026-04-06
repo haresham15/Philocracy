@@ -18,14 +18,36 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Philocracy — Governance By Love",
+  metadataBase: new URL("https://philocracy.com"),
+  title: {
+    default: "Philocracy — Governance By Love",
+    template: "%s | Philocracy",
+  },
   description:
-    "Premium streetwear that gives back to the community. Every piece you wear makes an impact.",
+    "Premium streetwear that gives back to the community. Every piece you wear makes an impact. Supporting non-profits through fashion.",
+  keywords: [
+    "streetwear",
+    "charity",
+    "non-profit fashion",
+    "exclusive drops",
+    "Columbus OH",
+    "Philocracy",
+    "governance by love",
+  ],
+  authors: [{ name: "Philocracy" }],
   openGraph: {
     title: "Philocracy — Governance By Love",
     description:
       "Premium streetwear that gives back to the community. Every piece you wear makes an impact.",
+    siteName: "Philocracy",
+    locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Philocracy — Governance By Love",
+    description:
+      "Premium streetwear that gives back to the community. Every piece you wear makes an impact.",
   },
 };
 
@@ -40,6 +62,20 @@ export default function RootLayout({
         className={`${playfair.variable} ${inter.variable} antialiased font-sans`}
         suppressHydrationWarning
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Philocracy",
+              url: "https://philocracy.com",
+              logo: "https://philocracy.com/icon.jpeg",
+              description:
+                "Premium streetwear that gives back to the community. Every piece you wear makes an impact.",
+            }),
+          }}
+        />
         <Navbar />
         <CartSidebar />
         <main>{children}</main>

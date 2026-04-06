@@ -1,6 +1,12 @@
-"use client";
-
+import { Metadata } from "next";
 import { ProductCard } from "@/components/ProductCard";
+
+export const metadata: Metadata = {
+  title: "Legacy Drops & Archive",
+  description:
+    "Explore past Philocracy drops. Review our archived collections and the amazing charities they supported.",
+};
+
 import products from "@/data/products.json";
 
 export default function LegacyShopPage() {

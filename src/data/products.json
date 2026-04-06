@@ -1,5 +1,21 @@
 [
   {
+    "id": "3",
+    "name": "Sam's Fans White Hoodie",
+    "price": 3999,
+    "description": "An exclusive white hoodie dropping in collaboration with Sam's Fans. Features unique front and back graphic designs. 100% of profits support music and art therapy for seriously ill children and their families.",
+    "charity_partner": "Sam's Fans",
+    "charity_description": "Sam's Fans is an Ohio-based non-profit organization that supports and enhances music and art therapy programs for seriously ill children and their families.",
+    "images": [
+      "/products/sams-fans-hoodie-front.png",
+      "/products/sams-fans-hoodie-back.png"
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "category": "current",
+    "featured": true,
+    "weight_oz": 24
+  },
+  {
     "id": "1",
     "name": "Sam's Fans Drop",
     "price": 6500,
@@ -8,8 +24,8 @@
     "charity_description": "Sam's Fans is an Ohio-based non-profit organization that supports and enhances music and art therapy programs for seriously ill children and their families.",
     "images": ["/products/empathy-hoodie.jpg"],
     "sizes": ["S", "M", "L", "XL", "XXL"],
-    "category": "current",
-    "featured": true,
+    "category": "past",
+    "featured": false,
     "weight_oz": 24
   },
   {

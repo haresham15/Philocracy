@@ -113,7 +113,7 @@ export function Navbar() {
               ) : (
                 <Link
                   key={item.label}
-                  href={item.href!}
+                  href={isHome && item.href?.startsWith("/#") ? item.href.substring(1) : item.href!}
                   className={`relative py-2 text-sm font-medium tracking-wide uppercase transition-colors duration-300 hover:text-amber ${
                     showSolid ? "text-charcoal" : "text-white/90"
                   } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blush-pink after:transition-all after:duration-300 hover:after:w-full`}
@@ -214,7 +214,7 @@ export function Navbar() {
             ].map(({ label, href }) => (
               <Link
                 key={label}
-                href={href}
+                href={isHome && href.startsWith("/#") ? href.substring(1) : href}
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg px-4 py-3 text-sm font-medium tracking-wide uppercase text-charcoal transition-colors hover:bg-blush-pink-light hover:text-charcoal"
               >

@@ -27,7 +27,7 @@ export async function checkout(items: CartItem[], shippingRates: ShippingRate[])
     quantity: item.quantity,
   }));
 
-  const shipping_options = shippingRates.map((rate) => ({
+  const dynamicShippingOptions = shippingRates.map((rate) => ({
     shipping_rate_data: {
       type: "fixed_amount" as const,
       fixed_amount: {
@@ -37,6 +37,20 @@ export async function checkout(items: CartItem[], shippingRates: ShippingRate[])
       display_name: rate.title,
     },
   }));
+
+  const shipping_options = [
+    {
+      shipping_rate_data: {
+        type: "fixed_amount" as const,
+        fixed_amount: {
+          amount: 0,
+          currency: "usd",
+        },
+        display_name: "Local Pickup (OSU Base) - Free",
+      },
+    },
+    ...dynamicShippingOptions,
+  ];
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",

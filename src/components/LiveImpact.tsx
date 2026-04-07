@@ -96,9 +96,9 @@ export function LiveImpact() {
 
         {/* Counters */}
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
-          <Counter end={127450} prefix="$" label="Total Donated" />
-          <Counter end={12} label="Charities Supported" />
-          <Counter end={8340} label="Items Sold" />
+          <Counter end={5500} prefix="$" label="Total Donated" />
+          <Counter end={4} label="Charities Supported" />
+          <Counter end={400} label="Items Sold" />
         </div>
 
         {/* Bottom accent — gradient line */}

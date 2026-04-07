@@ -43,8 +43,8 @@
   --color-amber: #F5A623;
   --color-amber-light: #FCCF6E;
   --color-amber-deep: #E09010;
-  --color-charcoal: #1A1A1A;
-  --color-charcoal-light: #2C2C2C;
+  --color-charcoal: #4A3525; /* Changed from black to Tan Brown */
+  --color-charcoal-light: #5C4A3D;
   --color-warm-tan: #E8D5BC;
   --color-warm-tan-light: #F0E6D6;
 
@@ -59,19 +59,19 @@
 
 :root {
   --background: #FDF8F0;
-  --foreground: #1A1A1A;
+  --foreground: #4A3525;
   --card: #FFFFFF;
-  --card-foreground: #1A1A1A;
+  --card-foreground: #4A3525;
   --popover: #FFFFFF;
-  --popover-foreground: #1A1A1A;
-  --primary: #1A1A1A;
+  --popover-foreground: #4A3525;
+  --primary: #4A3525;
   --primary-foreground: #FDF8F0;
   --secondary: #FAF3E8;
-  --secondary-foreground: #1A1A1A;
+  --secondary-foreground: #4A3525;
   --muted: #FAF3E8;
   --muted-foreground: #7A6F63;
   --accent: #F4B4C4;
-  --accent-foreground: #1A1A1A;
+  --accent-foreground: #4A3525;
   --destructive: #E74C3C;
   --border: #F0E6D6;
   --input: #F0E6D6;
@@ -209,4 +209,34 @@
 }
 .animate-dot-pulse {
   animation: dot-pulse 3s ease-in-out infinite;
+}
+
+/* ─── Premium Noise Grain Overlay ─── */
+.bg-noise {
+  position: relative;
+}
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  animation: grain-shift 8s steps(10) infinite;
+}
+
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
 }

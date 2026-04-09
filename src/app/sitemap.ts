@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import products from '@/data/products.json';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://philocracy.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://philocracy.com';
 
   const staticRoutes = [
     {

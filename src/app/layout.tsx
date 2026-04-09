@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://philocracy.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://philocracy.com"),
   title: {
     default: "Philocracy — Governance By Love",
     template: "%s | Philocracy",
@@ -33,6 +33,10 @@ export const metadata: Metadata = {
     "Columbus OH",
     "Philocracy",
     "governance by love",
+    "philocracy clothing",
+    "buy philocracy",
+    "ethical streetwear",
+    "philanthropy brand",
   ],
   authors: [{ name: "Philocracy" }],
   openGraph: {

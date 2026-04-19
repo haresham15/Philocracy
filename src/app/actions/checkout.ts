@@ -55,6 +55,10 @@ export async function checkout(items: CartItem[], shippingRates: ShippingRate[])
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items: lineItems,
+    automatic_tax: {
+      enabled: true,
+    },
+    customer_creation: "always",
     shipping_address_collection: {
       allowed_countries: ["US"],
     },

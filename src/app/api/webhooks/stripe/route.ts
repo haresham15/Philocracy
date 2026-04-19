@@ -48,6 +48,8 @@ export async function POST(req: Request) {
       const shippingMethodTitle = shippingRate?.display_name || "Local Pickup (OSU Base)";
       const isPickup = shippingMethodTitle.toLowerCase().includes("pickup");
 
+      const itemsSummary = expandedSession.metadata?.sizes || "No sizes metadata";
+
       // Log into Supabase
       const { error } = await supabase.from("orders").insert([
         {
@@ -59,6 +61,8 @@ export async function POST(req: Request) {
           is_pickup: isPickup,
           shipping_address: shippingDetails?.address || null,
           status: "paid",
+          items_summary: itemsSummary,
+          fulfillment_status: "unfulfilled",
         },
       ]);
 

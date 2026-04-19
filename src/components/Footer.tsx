@@ -1,8 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
+  const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
+
+  if (isAdmin) return null;
+
   return (
     <footer className="bg-charcoal text-white/80">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -109,8 +117,11 @@ export function Footer() {
           <p className="text-xs text-white/40">
             &copy; {new Date().getFullYear()} Philocracy. All rights reserved.
           </p>
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/40 flex items-center gap-2">
             Every item purchased supports a non-profit partner.
+            <Link href="/admin/login" className="text-white/20 hover:text-white/60 ml-1 transition-colors">
+              Admin
+            </Link>
           </p>
         </div>
       </div>

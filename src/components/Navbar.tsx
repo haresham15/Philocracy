@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 export function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isAdmin = pathname.startsWith("/admin");
   const totalItems = useCartStore((s) => s.totalItems());
   const openCart = useCartStore((s) => s.openCart);
   const [scrolled, setScrolled] = useState(false);
@@ -27,6 +28,10 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (isAdmin) {
+    return null;
+  }
 
   return (
     <header

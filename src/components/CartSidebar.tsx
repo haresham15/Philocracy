@@ -13,6 +13,7 @@ import { useCartStore } from "@/store/cart-store";
 import Image from "next/image";
 import { checkout } from "@/app/actions/checkout";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { getShippingRates, type ShippingRate } from "@/app/actions/shipping";
 
 export function CartSidebar() {
@@ -20,6 +21,9 @@ export function CartSidebar() {
     useCartStore();
   const totalPrice = useCartStore((s) => s.totalPrice());
   const totalItems = useCartStore((s) => s.totalItems());
+
+  const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
 
   const [zipCode, setZipCode] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
@@ -48,6 +52,8 @@ export function CartSidebar() {
       );
     }
   };
+
+  if (isAdmin) return null;
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>

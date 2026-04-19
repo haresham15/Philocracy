@@ -57,7 +57,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         {/* Image */}
         <div
-          className="relative aspect-[4/5] overflow-hidden bg-charcoal"
+          className="relative aspect-[4/5] overflow-hidden bg-[#faf9f6]"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
@@ -65,8 +65,8 @@ export function ProductCard({ product }: { product: Product }) {
             src={product.images[0]}
             alt={product.name}
             fill
-            className={`object-cover mix-blend-luminosity brightness-90 contrast-125 transition-transform duration-1000 ease-out ${
-              isHovering ? "scale-110 mix-blend-normal brightness-100" : "scale-100"
+            className={`object-cover transition-transform duration-1000 ease-out ${
+              isHovering ? "scale-110" : "scale-100"
             }`}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />

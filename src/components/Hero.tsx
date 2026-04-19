@@ -40,7 +40,7 @@ export function Hero() {
               alt="philocracy"
               width={1200}
               height={200}
-              className="w-full h-auto drop-shadow-sm"
+              className="w-full h-auto"
               priority
             />
           </div>

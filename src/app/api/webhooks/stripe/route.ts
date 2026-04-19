@@ -67,9 +67,16 @@ export async function POST(req: Request) {
       ]);
 
       if (error) {
-        console.error("Supabase insert error:", error.message);
-        // We still return 200 so Stripe doesn't retry infinitely if DB fails,
-        // or return 500 so it does retry. 500 is safer if we absolutely must ensure logging.
+        console.error("Supabase insert error:", error);
+        
+        // If it's a unique constraint violation, this webhook was already processed 
+        // Returning 200 tells Stripe to stop retrying.
+        if (error.code === '23505') {
+          console.log(`Order ${expandedSession.id} already exists. Returning 200 to prevent retries.`);
+          return NextResponse.json({ received: true });
+        }
+
+        // We return 500 for actual database errors so Stripe can retry later.
         return NextResponse.json({ error: "Database error" }, { status: 500 });
       }
     } catch (err: any) {

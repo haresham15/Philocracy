@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { updateOrderStatus, syncHistoricalOrders } from "../actions";
+import { updateOrderStatus, syncHistoricalOrders, getOrders, generateShippingLabel } from "../actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -24,21 +24,18 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isGeneratingLabelFor, setIsGeneratingLabelFor] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
   async function fetchOrders() {
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching orders:", error);
-    } else {
+    try {
+      const data = await getOrders();
       setOrders(data as Order[]);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
     }
     setIsLoading(false);
   }
@@ -50,6 +47,21 @@ export default function OrdersPage() {
     } catch (e) {
       alert("Failed to update order status");
     }
+  }
+
+  async function handleGenerateLabel(orderId: string) {
+    setIsGeneratingLabelFor(orderId);
+    try {
+      const result = await generateShippingLabel(orderId);
+      if (result.success && result.labelUrl) {
+        window.open(result.labelUrl, "_blank");
+        // Optimitically update local state to reflect it is shipped
+        setOrders(orders.map(o => o.id === orderId ? { ...o, fulfillment_status: "shipped" } : o));
+      }
+    } catch (e: any) {
+      alert("Failed to generate label: " + e.message);
+    }
+    setIsGeneratingLabelFor(null);
   }
 
   async function handleSync() {
@@ -167,6 +179,17 @@ export default function OrdersPage() {
                       {getStatusBadge(order.fulfillment_status)}
                     </td>
                     <td className="px-6 py-4 text-right space-y-2">
+                      {!order.is_pickup && order.fulfillment_status !== "shipped" && (
+                        <Button 
+                          onClick={() => handleGenerateLabel(order.id)}
+                          disabled={isGeneratingLabelFor === order.id}
+                          size="sm"
+                          className="w-full bg-indigo-600 text-white hover:bg-indigo-700 text-xs shadow-sm"
+                        >
+                          {isGeneratingLabelFor === order.id ? "Generating..." : "Print Shipping Label"}
+                        </Button>
+                      )}
+
                       {order.fulfillment_status === "unfulfilled" && (
                         <Button 
                           onClick={() => handleStatusChange(order.id, order.is_pickup ? "ready_for_pickup" : "shipped")}

@@ -94,3 +94,126 @@ export async function syncHistoricalOrders() {
   revalidatePath("/admin/orders");
   return { success: true, count: newSessions.length };
 }
+
+export async function getOrders() {
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching orders:", error.message);
+    throw new Error("Failed to fetch orders");
+  }
+
+  return data;
+}
+
+import { Shippo } from "shippo";
+
+// Initialize Shippo - safe fallback if key is missing to prevent module crash
+const shippoToken = process.env.SHIPPO_API_KEY || "shippo_test_dummy";
+const shippo = new Shippo({ apiKeyHeader: shippoToken });
+
+export async function generateShippingLabel(orderId: string) {
+  if (shippoToken === "shippo_test_dummy") {
+    throw new Error("Missing SHIPPO_API_KEY in Vercel/local environment variables.");
+  }
+
+  // 1. Fetch order details
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
+
+  if (error || !order) {
+    throw new Error("Order not found in database.");
+  }
+
+  if (order.is_pickup) {
+    throw new Error("Cannot generate shipping label for a local pickup order.");
+  }
+
+  const address = order.shipping_address;
+  if (!address || !address.line1 || !address.city || !address.state || !address.postal_code) {
+    throw new Error("Incomplete shipping address on order. Cannot generate label.");
+  }
+
+  try {
+    // 2. Create the shipment with origin and destination
+    // Wait, the SDK uses addressCreateRequest arrays or objects? 
+    // In SDK v2.18, shipments.create takes a ShipmentCreateRequest. 
+    const shipment = await shippo.shipments.create({
+      addressFrom: {
+        name: "Philocracy Fulfillment",
+        company: "Philocracy",
+        street1: "The Ohio State University",
+        city: "Columbus",
+        state: "OH",
+        zip: "43210",
+        country: "US",
+        phone: "555-555-5555",
+        email: "support@philocracy.com",
+      },
+      addressTo: {
+        name: order.customer_name || "Customer",
+        street1: address.line1,
+        street2: address.line2 || "",
+        city: address.city,
+        state: address.state,
+        zip: address.postal_code,
+        country: address.country || "US",
+        email: order.customer_email || undefined,
+      },
+      parcels: [
+        {
+          length: "12",
+          width: "10",
+          height: "2",
+          distanceUnit: "in",
+          weight: "16",
+          massUnit: "oz",
+        },
+      ],
+    });
+
+    if (!shipment.rates || shipment.rates.length === 0) {
+      throw new Error("No shipping rates available for this address.");
+    }
+
+    // 3. Find the lowest cost rate
+    const cheapestRate = shipment.rates.reduce((prev: any, curr: any) => {
+      return parseFloat(prev.amount) < parseFloat(curr.amount) ? prev : curr;
+    });
+
+    // 4. Purchase the label via Transactions
+    const transaction = await shippo.transactions.create({
+      rate: cheapestRate.objectId,
+      async: false,
+    });
+
+    if (transaction.status !== "SUCCESS") {
+      throw new Error(`Shippo transaction failed. Status: ${transaction.status}`);
+    }
+
+    // 5. Update the Database status
+    // Note: If you want to track tracking_number, you can append it later, 
+    // but we'll mark it as shipped automatically.
+    await supabase.from("orders").update({
+      fulfillment_status: "shipped",
+    }).eq("id", orderId);
+
+    revalidatePath("/admin/orders");
+    
+    return { 
+      success: true, 
+      labelUrl: transaction.labelUrl, 
+      trackingNumber: transaction.trackingNumber 
+    };
+
+  } catch (err: any) {
+    console.error("Shippo error:", err);
+    throw new Error(err.message || "Failed to communicate with Shippo API.");
+  }
+}

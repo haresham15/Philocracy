@@ -25,10 +25,13 @@ export default function AdminLayout({
             <Package className="h-4 w-4" />
             Orders
           </Link>
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold tracking-wide text-charcoal/50 cursor-not-allowed">
+          <Link 
+            href="/admin/settings"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold tracking-wide text-charcoal/70 hover:text-charcoal hover:bg-warm-tan-light transition-colors"
+          >
             <Settings className="h-4 w-4" />
             Settings
-          </div>
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-border">

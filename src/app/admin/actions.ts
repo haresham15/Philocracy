@@ -111,9 +111,19 @@ export async function getOrders() {
 
 import { Shippo } from "shippo";
 
-// Initialize Shippo - safe fallback if key is missing to prevent module crash
-const shippoToken = process.env.SHIPPO_API_KEY || "shippo_test_dummy";
-const shippo = new Shippo({ apiKeyHeader: shippoToken });
+// Lazy-initialize Shippo to avoid crashing the module at import time
+// when SHIPPO_API_KEY is missing (e.g., on the login page)
+let _shippoInstance: Shippo | null = null;
+function getShippo(): Shippo {
+  if (!_shippoInstance) {
+    const token = process.env.SHIPPO_API_KEY;
+    if (!token) {
+      throw new Error("Missing SHIPPO_API_KEY in environment variables. Add it to .env.local and Vercel.");
+    }
+    _shippoInstance = new Shippo({ apiKeyHeader: token });
+  }
+  return _shippoInstance;
+}
 
 // Must match the origin in src/app/actions/shipping.ts so label costs align with quoted rates
 const ORIGIN_ADDRESS = {
@@ -129,9 +139,8 @@ const ORIGIN_ADDRESS = {
 };
 
 export async function generateShippingLabel(orderId: string) {
-  if (shippoToken === "shippo_test_dummy") {
-    throw new Error("Missing SHIPPO_API_KEY in environment variables. Add it to .env.local and Vercel.");
-  }
+  // getShippo() will throw if SHIPPO_API_KEY is missing
+  const shippo = getShippo();
 
   // 1. Fetch order details
   const { data: order, error } = await supabase

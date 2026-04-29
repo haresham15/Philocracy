@@ -4,10 +4,16 @@ import { Shippo } from "shippo";
 import type { CartItem } from "@/store/cart-store";
 import products from "@/data/products.json";
 
-// Initialize Shippo client
-const shippo = new Shippo({
-  apiKeyHeader: process.env.SHIPPO_API_KEY || "shippo_test_dummy_key",
-});
+// Lazy-initialize Shippo to avoid crashing the module at import time
+let _shippoInstance: Shippo | null = null;
+function getShippo(): Shippo {
+  if (!_shippoInstance) {
+    _shippoInstance = new Shippo({
+      apiKeyHeader: process.env.SHIPPO_API_KEY || "shippo_test_dummy_key",
+    });
+  }
+  return _shippoInstance;
+}
 
 export type ShippingRate = {
   id: string;
@@ -61,7 +67,7 @@ export async function getShippingRates(
 
   try {
     // 3. Create a shipment via Shippo
-    const shipmentMatch = await shippo.shipments.create({
+    const shipmentMatch = await getShippo().shipments.create({
       addressFrom: ADDRESS_FROM,
       addressTo: {
         zip: zipCode,

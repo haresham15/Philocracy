@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { loginAdmin } from "../actions";
 import { Button } from "@/components/ui/button";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export default function AdminLoginPage() {
   const [error, formAction, isPending] = useActionState(async (state: any, formData: FormData) => {
@@ -10,6 +11,8 @@ export default function AdminLoginPage() {
       await loginAdmin(formData);
       return null;
     } catch (e: any) {
+      // redirect() throws a special error that Next.js must handle — re-throw it
+      if (isRedirectError(e)) throw e;
       return e.message;
     }
   }, null);

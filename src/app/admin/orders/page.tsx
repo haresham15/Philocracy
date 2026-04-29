@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { updateOrderStatus, syncHistoricalOrders, getOrders, generateShippingLabel } from "../actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,8 @@ interface Order {
   status: string;
   items_summary: string;
   fulfillment_status: string;
+  tracking_number: string | null;
+  label_url: string | null;
 }
 
 export default function OrdersPage() {
@@ -55,8 +56,8 @@ export default function OrdersPage() {
       const result = await generateShippingLabel(orderId);
       if (result.success && result.labelUrl) {
         window.open(result.labelUrl, "_blank");
-        // Optimitically update local state to reflect it is shipped
-        setOrders(orders.map(o => o.id === orderId ? { ...o, fulfillment_status: "shipped" } : o));
+        // Re-fetch to get the persisted tracking_number + label_url
+        await fetchOrders();
       }
     } catch (e: any) {
       alert("Failed to generate label: " + e.message);
@@ -179,6 +180,7 @@ export default function OrdersPage() {
                       {getStatusBadge(order.fulfillment_status)}
                     </td>
                     <td className="px-6 py-4 text-right space-y-2">
+                      {/* Generate label button for shipping orders that haven't shipped yet */}
                       {!order.is_pickup && order.fulfillment_status !== "shipped" && (
                         <Button 
                           onClick={() => handleGenerateLabel(order.id)}
@@ -190,13 +192,33 @@ export default function OrdersPage() {
                         </Button>
                       )}
 
-                      {order.fulfillment_status === "unfulfilled" && (
+                      {/* Show tracking info + reprint for shipped orders with labels */}
+                      {!order.is_pickup && order.fulfillment_status === "shipped" && order.label_url && (
+                        <div className="space-y-1.5">
+                          {order.tracking_number && (
+                            <div className="text-[10px] font-mono text-muted-foreground bg-zinc-50 px-2 py-1 rounded border border-zinc-200 truncate" title={order.tracking_number}>
+                              📦 {order.tracking_number}
+                            </div>
+                          )}
+                          <Button 
+                            onClick={() => window.open(order.label_url!, "_blank")}
+                            size="sm"
+                            variant="outline"
+                            className="w-full text-xs shadow-sm border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                          >
+                            Reprint Label
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Manual status change for pickup orders */}
+                      {order.fulfillment_status === "unfulfilled" && order.is_pickup && (
                         <Button 
-                          onClick={() => handleStatusChange(order.id, order.is_pickup ? "ready_for_pickup" : "shipped")}
+                          onClick={() => handleStatusChange(order.id, "ready_for_pickup")}
                           size="sm"
                           className="w-full bg-charcoal text-white hover:bg-charcoal/90 text-xs shadow-sm"
                         >
-                          Mark {order.is_pickup ? "Ready" : "Shipped"}
+                          Mark Ready
                         </Button>
                       )}
                       

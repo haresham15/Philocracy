@@ -115,9 +115,22 @@ import { Shippo } from "shippo";
 const shippoToken = process.env.SHIPPO_API_KEY || "shippo_test_dummy";
 const shippo = new Shippo({ apiKeyHeader: shippoToken });
 
+// Must match the origin in src/app/actions/shipping.ts so label costs align with quoted rates
+const ORIGIN_ADDRESS = {
+  name: "Philocracy Fulfillment",
+  company: "Philocracy",
+  street1: "6659 Perimeter Dr",
+  city: "Dublin",
+  state: "OH",
+  zip: "43016",
+  country: "US",
+  phone: "555-555-5555",
+  email: "support@philocracy.com",
+};
+
 export async function generateShippingLabel(orderId: string) {
   if (shippoToken === "shippo_test_dummy") {
-    throw new Error("Missing SHIPPO_API_KEY in Vercel/local environment variables.");
+    throw new Error("Missing SHIPPO_API_KEY in environment variables. Add it to .env.local and Vercel.");
   }
 
   // 1. Fetch order details
@@ -135,27 +148,25 @@ export async function generateShippingLabel(orderId: string) {
     throw new Error("Cannot generate shipping label for a local pickup order.");
   }
 
+  // 2. Prevent double-purchasing a label
+  if (order.tracking_number && order.label_url) {
+    return {
+      success: true,
+      labelUrl: order.label_url,
+      trackingNumber: order.tracking_number,
+      alreadyExisted: true,
+    };
+  }
+
   const address = order.shipping_address;
   if (!address || !address.line1 || !address.city || !address.state || !address.postal_code) {
     throw new Error("Incomplete shipping address on order. Cannot generate label.");
   }
 
   try {
-    // 2. Create the shipment with origin and destination
-    // Wait, the SDK uses addressCreateRequest arrays or objects? 
-    // In SDK v2.18, shipments.create takes a ShipmentCreateRequest. 
+    // 3. Create the shipment with origin and destination
     const shipment = await shippo.shipments.create({
-      addressFrom: {
-        name: "Philocracy Fulfillment",
-        company: "Philocracy",
-        street1: "The Ohio State University",
-        city: "Columbus",
-        state: "OH",
-        zip: "43210",
-        country: "US",
-        phone: "555-555-5555",
-        email: "support@philocracy.com",
-      },
+      addressFrom: ORIGIN_ADDRESS,
       addressTo: {
         name: order.customer_name || "Customer",
         street1: address.line1,
@@ -179,29 +190,30 @@ export async function generateShippingLabel(orderId: string) {
     });
 
     if (!shipment.rates || shipment.rates.length === 0) {
-      throw new Error("No shipping rates available for this address.");
+      throw new Error("No shipping rates available for this address. Verify the address is valid.");
     }
 
-    // 3. Find the lowest cost rate
+    // 4. Find the lowest cost rate
     const cheapestRate = shipment.rates.reduce((prev: any, curr: any) => {
       return parseFloat(prev.amount) < parseFloat(curr.amount) ? prev : curr;
     });
 
-    // 4. Purchase the label via Transactions
+    // 5. Purchase the label via Transactions
     const transaction = await shippo.transactions.create({
       rate: cheapestRate.objectId,
       async: false,
     });
 
     if (transaction.status !== "SUCCESS") {
-      throw new Error(`Shippo transaction failed. Status: ${transaction.status}`);
+      const msgs = (transaction as any).messages?.map((m: any) => m.text).join("; ") || "Unknown error";
+      throw new Error(`Shippo label purchase failed: ${msgs}`);
     }
 
-    // 5. Update the Database status
-    // Note: If you want to track tracking_number, you can append it later, 
-    // but we'll mark it as shipped automatically.
+    // 6. Persist tracking number + label URL and mark shipped
     await supabase.from("orders").update({
       fulfillment_status: "shipped",
+      tracking_number: transaction.trackingNumber || null,
+      label_url: transaction.labelUrl || null,
     }).eq("id", orderId);
 
     revalidatePath("/admin/orders");
@@ -209,7 +221,8 @@ export async function generateShippingLabel(orderId: string) {
     return { 
       success: true, 
       labelUrl: transaction.labelUrl, 
-      trackingNumber: transaction.trackingNumber 
+      trackingNumber: transaction.trackingNumber,
+      alreadyExisted: false,
     };
 
   } catch (err: any) {
@@ -217,3 +230,4 @@ export async function generateShippingLabel(orderId: string) {
     throw new Error(err.message || "Failed to communicate with Shippo API.");
   }
 }
+

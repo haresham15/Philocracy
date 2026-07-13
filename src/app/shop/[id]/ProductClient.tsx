@@ -126,16 +126,12 @@ export function ProductClient({ product }: { product: ProductType }) {
 
           {/* Add to cart */}
           <Button
-            onClick={handleAddToCart}
-            disabled={!selectedSize}
+            onClick={(e) => e.preventDefault()}
+            disabled
             size="lg"
-            className={`mt-8 py-7 text-sm font-black uppercase tracking-widest transition-all ${
-              added
-                ? "bg-amber-deep text-white hover:bg-amber-deep"
-                : "bg-charcoal text-white hover:bg-charcoal/90 hover:scale-[1.01]"
-            } disabled:cursor-not-allowed disabled:opacity-50`}
+            className="mt-8 py-7 text-sm font-black uppercase tracking-widest transition-all bg-charcoal text-white opacity-50 cursor-not-allowed"
           >
-            {added ? "✓ Added to Cart" : "Add to Cart"}
+            Store Closed
           </Button>
 
           {/* Charity info */}

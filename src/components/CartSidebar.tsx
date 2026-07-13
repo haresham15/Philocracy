@@ -240,11 +240,12 @@ export function CartSidebar() {
                 )}
               </div>
               <Button
-                onClick={handleCheckout}
+                onClick={(e) => e.preventDefault()}
+                disabled
                 size="lg"
-                className="w-full rounded-full bg-charcoal py-6 text-sm font-semibold uppercase tracking-widest text-white hover:bg-charcoal/90 transition-all"
+                className="w-full rounded-full bg-charcoal py-6 text-sm font-semibold uppercase tracking-widest text-white opacity-50 cursor-not-allowed"
               >
-                Checkout — ${(totalPrice / 100).toFixed(2)}
+                Store Closed
               </Button>
             </SheetFooter>
           </>
